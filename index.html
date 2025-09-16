@@ -587,7 +587,7 @@
         </div>
       <div class="status-container">
     <span class="status-pill ${statusClass(inv.status)}">${inv.status} ${(inv.status.toLowerCase() === 'update status') ? `<img style="height: 1.2rem;" src = "./down-arrow.png"/>` : ``}</span>
-    ${(inv.status.toLowerCase() === 'overdue' || inv.status.toLowerCase() === 'partially paid') ? `<img src="./bell.png" class="bell-icon" />` :
+    ${(inv.status.toLowerCase() === 'overdue' || inv.status.toLowerCase() === 'partially paid'|| inv.status.toLowerCase() === 'disputed') ? `<img src="./bell.png" class="bell-icon" />` :
                     (inv.status.toLowerCase() === 'draft') ? `<img src="./edit.webp" class="bell-icon" />` : ``}
   </div>
       `;
