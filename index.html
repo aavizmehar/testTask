@@ -520,6 +520,7 @@
     </div>
 
     <script>
+        
         /***********************
          *  DATA (edit here)   *
          ***********************/
@@ -597,131 +598,133 @@
          *  Graphs
          ***********************/
         // Data for different periods
-        const data1Month = {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            incomeData: [3500, 4800, 6700, 3200, 5200, 0],
-            momGrowth: [0, 40, 50, -50, 50, -100]
-        };
+      const data1Month = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    incomeData: [3500, 4800, 6700, 3200, 5200, 7200],
+    momGrowth: [0, 37, 40, -52, 63, 38]
+};
 
-        const data3Month = {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            incomeData: [3500, 4800, 6700, 3200, 5200, 0],
-            momGrowth: [0, 35, 45, -45, 45, -95]
-        };
+const data3Month = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    incomeData: [4200, 5500, 6200, 4800, 6800, 7800],
+    momGrowth: [0, 31, 13, -23, 42, 15]
+};
 
         let currentPeriod = '1m';
         let incomeChart;
+function initChart() {
+    const ctx = document.getElementById('incomeChart').getContext('2d');
+    const currentData = currentPeriod === '1m' ? data1Month : data3Month;
 
-        function initChart() {
-            const ctx = document.getElementById('incomeChart').getContext('2d');
-            const currentData = currentPeriod === '1m' ? data1Month : data3Month;
-
-            incomeChart = new Chart(ctx, {
-                data: {
-                    labels: currentData.labels,
-                    datasets: [
-                        {
-                            type: 'bar',
-                            label: 'Income',
-                            data: currentData.incomeData,
-                            backgroundColor: 'rgba(123,43,212,0.9)',
-                            borderRadius: 7,
-                            barPercentage: 0.8,  // controls the bar width inside category
-                            yAxisID: 'y',
-
-                        },
-                        {
-                            type: 'line',
-                            label: 'MoM Growth',
-                            data: currentData.momGrowth,
-                            borderColor: '#8b2b2b',
-                            backgroundColor: 'rgba(139,43,43,0.06)',
-                            tension: 0.35,
-                            pointRadius: 0,
-                            borderWidth: 3,
-                            fill: false,
-                            yAxisID: 'yPercent'
-                        }
-                    ]
+    incomeChart = new Chart(ctx, {
+        data: {
+            labels: currentData.labels,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: 'income',  // lowercase to match your image
+                    data: currentData.incomeData,
+                    backgroundColor: '#8B5CF6',  // Purple color to match image
+                    borderRadius: 7,
+                    barPercentage: 0.8,
+                    yAxisID: 'y',
+                    order: 2  // Render bars behind line
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    stacked: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            position: 'left',
-                            max: 8000,
-                            ticks: {
-                                stepSize: 2000,
-                                callback: function (v) { return '$' + (v / 1000) + 'k'; }
-                            },
-                            grid: { color: 'rgba(0,0,0,0.03)' }
-                        },
-                        yPercent: {
-                            type: 'linear',
-                            position: 'right',
-                            min: -100,
-                            max: 100,
-                            border: {
-                                color: '#8b2b2b',        // line color of the axis
-                                width: 2             // optional, thickness
-                            },
-                            ticks: {
-                                stepSize: 50,
-                                callback: function (v) { return v + '%'; },
-                            },
-                            grid: {
-                                drawOnChartArea: false,
-                                tickColor: '#8b2b2b',
-                                color: '#8b2b2b'
-
-                            }
-                        },
-                        x: {
-                            categoryPercentage: 1,
-                            grid: {
-                                display: false
-                            }
-                        }
+                {
+                    type: 'line',
+                    label: 'momGrowth',  // lowercase to match your image
+                    data: currentData.momGrowth,
+                    borderColor: '#8B2635',  // Dark red/brown to match image
+                    backgroundColor: 'rgba(139,38,53,0.06)',
+                    tension: 0.35,
+                    pointRadius: 0,
+                    borderWidth: 3,
+                    fill: false,
+                    yAxisID: 'yPercent',
+                    order: 1  // Render line on top
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            stacked: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    position: 'left',
+                    max: 8000,
+                    ticks: {
+                        stepSize: 2000,
+                        callback: function (v) { return '$' + (v / 1000) + 'k'; }
                     },
-                    plugins: {
-                        // legend: {
-                        //     display: true,
-                        //     labels: {
-                        //         usePointStyle: true,
-                        //         padding: 20
-                        //     }
-                        // },
-                        legend: {
-                            display: true,
-                            position: 'bottom',
-                            labels: {
-                                usePointStyle: true, // enable point in legend
-                                pointStyle: 'circle', // circle marker
-                                color: '#8b2b2b'     // legend text color
-                            }
-                        },
-                        // 
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    if (context.dataset.type === 'bar') {
-                                        return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
-                                    } else {
-                                        return context.dataset.label + ': ' + context.parsed.y + '%';
-                                    }
-                                }
+                    grid: { color: 'rgba(0,0,0,0.03)' }
+                },
+                yPercent: {
+                    type: 'linear',
+                    position: 'right',
+                    min: -100,
+                    max: 100,
+                    border: {
+                        color: '#8B2635',
+                        width: 2
+                    },
+                    ticks: {
+                        stepSize: 50,
+                        callback: function (v) { return v + '%'; },
+                    },
+                    grid: {
+                        drawOnChartArea: false,
+                        tickColor: '#8B2635',
+                        color: '#8B2635'
+                    }
+                },
+                x: {
+                    categoryPercentage: 1,
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: 'rect',  // Rectangle for bar chart
+                        color: '#666',
+                        padding: 20,
+                        generateLabels: function(chart) {
+                            const datasets = chart.data.datasets;
+                            return datasets.map((dataset, i) => ({
+                                text: dataset.label,
+                                fillStyle: i === 0 ? dataset.backgroundColor : dataset.borderColor,
+                                strokeStyle: i === 0 ? dataset.backgroundColor : dataset.borderColor,
+                                lineWidth: i === 1 ? 3 : 0,
+                                pointStyle: i === 0 ? 'rect' : 'line',
+                                datasetIndex: i
+                            }));
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            if (context.dataset.type === 'bar') {
+                                return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                            } else {
+                                return context.dataset.label + ': ' + context.parsed.y + '%';
                             }
                         }
                     }
                 }
-            });
+            }
         }
-
-        function switchPeriod(period) {
+    });
+}
+function switchPeriod(period) {
             currentPeriod = period;
             document.getElementById('btn1m').classList.toggle('active', period === '1m');
             document.getElementById('btn3m').classList.toggle('active', period === '3m');
@@ -731,14 +734,14 @@
             incomeChart.data.datasets[0].data = currentData.incomeData;
             incomeChart.data.datasets[1].data = currentData.momGrowth;
             incomeChart.update();
-            updateStats(currentData);
+            // updateStats(currentData);
         }
 
 
 
         window.onload = function () {
             initChart();
-            updateStats(data1Month);
+            // updateStats(data1Month);
         };
 
         /***********************
