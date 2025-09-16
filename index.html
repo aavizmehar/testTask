@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Invoice Dashboard — Desktop</title>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg: #fbf9fb;
+            --card: #ffffff;
+            --muted: #999999;
+            --accent: #8134AF;
+            --accent-700: #5a1fb2;
+            --soft-border: #f0eef2;
+            --radius: 18px;
+            --pill-paid: #9CEFB8;
+            --pill-over: #FFB1B1;
+            --pill-part: #FFFAE5;
+            --pill-draft: #F2F2F2;
+            --shadow: 0 8px 22px rgba(16, 16, 16, 0.06);
+            font-family: Roboto !important;
+        }
+
+        .paw {
+            object-fit: cover;
+            height: 0.6rem;
+            object-position: center;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            /* background: var(--bg); */
+            color: #333;
+            font-size: 15px;
+            line-height: 1.25
+        }
+
+        .wrap {
+            max-width: 1180px;
+
+        }
+
+        /* header */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgb(228, 206, 224);
+            padding: 1rem;
+        }
+
+        .left {
+            display: flex;
+            align-items: center;
+            gap: 14px
+        }
+
+        .title {
+            font-weight: 590;
+            font-style: Semibold;
+            font-size: 19px;
+            leading-trim: NONE;
+            line-height: 22px;
+            letter-spacing: -0.43px;
+            text-align: center;
+        }
+
+        .profile {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #ddd;
+            background-size: cover
+        }
+
+        /* create card */
+        .create-card {
+            background: var(--Light-Grey, #F2F2F2);
+
+            border: 1px solid var(--soft-border);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-radius: 32px;
+            padding: 30px 18px;
+            width: 50%;
+
+            margin: 1.5rem auto;
+
+        }
+
+        .plus {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            background: var(--Light-Grey, #F2F2F2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            font-weight: 500;
+            position: relative;
+            z-index: 0;
+            /* make sure pseudo stays behind */
+        }
+
+        .plus::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            padding: 4px;
+            /* thickness of border */
+            background: linear-gradient(180deg, #DD2A7B, #9747FF, #334CCA);
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            z-index: -1;
+        }
+
+
+        .plus-text {
+            background: linear-gradient(180deg, #DD2A7B, #9747FF, #334CCA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: absolute;
+            /* top: -2px; */
+            line-height: 1;
+
+        }
+
+        .create-card h1 {
+            background: linear-gradient(180.36deg, #DD2A7B -35.12%, #9747FF 49.87%, #334CCA 104.94%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 26px;
+            margin: 1.5rem 0 0.5rem 0;
+            font-weight: 600;
+        }
+
+        .create-card p {
+            margin: 0;
+            color: var(--muted)
+        }
+
+        /* controls + earnings row */
+        .controls {
+            display: flex;
+            gap: 18px;
+            margin-top: 18px;
+            align-items: flex-start
+        }
+
+        .time-card {
+            flex: 1;
+            background: var(--card);
+            padding: 18px;
+            border-radius: 16px;
+            border: 1px solid var(--soft-border)
+        }
+
+        .time-card .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .periods {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap
+        }
+
+        .pill {
+            color: #999999;
+            width: 80;
+            height: 28;
+            background: #fff;
+            gap: 2px;
+            border: 1px solid #F2F2F2;
+            font-size: 20px;
+            border-radius: 16px;
+            font-weight: 200;
+            border-width: 1px;
+            padding-top: 4px;
+            padding-right: 12px;
+            padding-bottom: 4px;
+            padding-left: 12px;
+
+        }
+
+        .pill.active {
+            background: #F3E8FF;
+            background: linear-gradient(169.7deg, #DD2A7B 1.49%, #9747FF 42.07%, #334CCA 99.84%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .earnings {
+            width: 420px;
+            background: var(--card);
+            padding: 18px;
+            border-radius: 16px;
+            border: 1px solid var(--soft-border)
+        }
+
+        .label {
+            color: var(--muted);
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .earnings .total {
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 26px;
+            margin-top: 8px
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px
+        }
+
+        .stat {
+            background: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--soft-border)
+        }
+
+        .stat .small {
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .stat .big {
+            font-weight: 800;
+            color: var(--accent);
+            font-size: 20px;
+            margin-top: 6px
+        }
+
+        /* main layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 18px;
+            margin-top: 18px
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 18px;
+
+            padding: 16px 22px;
+        }
+
+        /* chart card */
+        .chart-card h3 {
+            margin: 0 0 6px;
+            font-size: 16px
+        }
+
+        .chart-desc {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 8px
+        }
+
+        .chart-wrap {
+            width: 100%;
+            height: 360px;
+            border-radius: 12px;
+            padding: 8px;
+            background: transparent
+        }
+
+        /* invoice list */
+        .invoices h3 {
+            margin: 0 0 12px;
+            font-size: 16px
+        }
+
+        .invoice-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px;
+            border-radius: 14px;
+            border: 2px solid var(--soft-border);
+            margin-bottom: 12px;
+            background: #fff
+        }
+
+        .invoice-meta {
+            display: flex;
+            flex-direction: column
+        }
+
+        .invoice-title {
+            font-weight: medium;
+            color: #6B7280;
+            font-size: 18px;
+        }
+
+        .invoice-sub {
+            color: var(--muted);
+            margin-top: 6px;
+            font-size: 16px
+        }
+
+        .status-pill {
+            padding: 8px 14px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 500;
+            font-size: 16px;
+
+
+        }
+
+        .pill-paid {
+            background: var(--pill-paid);
+            color: #34C759;
+
+        }
+
+        .pill-updstatus {
+            background: #8134AF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            color: #fff;
+
+        }
+
+        .pill-updstatus img {
+            filter: brightness(0) invert(1);
+            height: 6px;
+        }
+
+        .pill-over {
+            background: var(--pill-over);
+            color: #FF2D55;
+
+        }
+
+        .pill-part {
+            background: var(--pill-part);
+            color: #FFCC00;
+        }
+
+        .pill-draft {
+            background: var(--pill-draft);
+            color: var(--muted)
+        }
+
+        /* full width invoice list below */
+        .full-invoices {
+            margin-top: 18px
+        }
+
+        .footer {
+
+            border-top: 1px solid #f0eef2;
+
+            margin: 5rem 3rem;
+            text-align: center;
+            color: #b6b6b6;
+            padding-top: 8px;
+        }
+
+        .status-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            /* space between pill and bell */
+        }
+
+        .bell-icon {
+            width: 18px;
+            height: 18px;
+            display: none;
+            cursor: pointer;
+        }
+
+        .status-container:hover .bell-icon {
+            display: inline-block;
+        }
+
+
+        /* responsiveness */
+        @media (max-width:980px) {
+            .main-grid {
+                grid-template-columns: 1fr
+            }
+
+            .controls {
+                flex-direction: column
+            }
+
+            .earnings {
+                width: 100%
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <!-- header -->
+        <header>
+            <div class="left">
+                <div class="title">Dashboard</div>
+            </div>
+            <div class="profile" title="Profile" style="background-image:url('./profile.webp')"></div>
+        </header>
+
+        <!-- create card -->
+        <div class="create-card">
+            <div class="plus">
+                <span class="plus-text">+</span>
+            </div>
+            <h1>Create New Invoice</h1>
+            <p>Start by creating and sending new invoice</p>
+
+        </div>
+        <div style="text-align:center">
+            <h3 style="color:var(--accent);margin:12px;font-weight: 400;">Or upload an existing invoice and set payment
+                reminder</h3>
+        </div>
+
+        <!-- controls row -->
+        <div class="controls">
+            <div class="time-card">
+                <div class="top">
+                    <div style="width:100%;display: flex; justify-content: space-between; align-items: center;">
+                        <div class="label">Time Period</div>
+                        <div style="font-size:18px;color:var(--muted)">dd:mm:yyyy — dd:mm:yyyy</div>
+                    </div>
+                </div>
+
+                <div class="periods" style="margin-top:12px">
+
+                    <button class="btn active pill" onclick="switchPeriod('1m')" id="btn1m">1Month</button>
+                    <button class="btn pill" onclick="switchPeriod('3m')" id="btn3m">3Months</button>
+                    <button class="pill" data-period="1y"
+                        style="display: flex; align-items: center; justify-content: center;gap:0.3rem;">1Year <img
+                            src="./king.webp" class="" /></button>
+                    <button class="pill" data-period="custom"
+                        style="display: flex; align-items: center; justify-content: center;gap: 0.3rem;"><img
+                            src="./calendar.webp">Custom </button>
+                </div>
+            </div>
+
+            <div class="earnings">
+                <div class="label">Total Earnings</div>
+                <div class="total" id="totalEarnings">$1,25,000</div>
+
+                <div class="stats-grid">
+                    <div class="stat">
+                        <div class="label">Payment Awaited</div>
+                        <div class="big" id="awaited">$25,000</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">Payment Overdue</div>
+                        <div class="big" id="overdue">$25,000</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- main content: chart + invoices -->
+        <div class="main-grid">
+            <div class="card chart-card">
+                <h3>Income Trend</h3>
+                <div class="chart-desc">Your monthly income and growth for the last 6 months.</div>
+                <div class="chart-wrap">
+                    <canvas id="incomeChart" style="width:100%;height:100%;display:block"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- full width invoice list -->
+        <div class="full-invoices">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-weight:500;font-size:20px;margin-bottom:12px;color:var(--muted)">Your Invoices</h3>
+                    <img style="height: 1.2rem;" src="./down-arrow.png">
+                </div>
+                <div id="fullList">
+                    <!-- full-width invoices by JS -->
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div style="font-size:16px"><b>Spark</b><img class="paw" src="./union.png" />nomy</div>
+
+            <div style="font-size:13px">sparking the creator economy</div>
+        </div>
+    </div>
+
+    <script>
+        /***********************
+         *  DATA (edit here)   *
+         ***********************/
+        // income values (Jan → Jun). Edit to change graph.
+        const incomeData = [3800, 5100, 6800, 2500, 5200, 7000];
+
+        // momGrowth % values for same months (can be negative)
+        const momGrowth = [12, 8, 33, -63, 108, 34];
+
+        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+
+        // invoices static data (id, title, amount, due, status)
+        const invoices = [
+            { id: 1010, title: 'Client Name', amount: '₹1,25,000', due: '2024-06-15', status: 'Update Status' },
+            { id: 1001, title: 'Client Name', amount: '₹1,25,000', due: '2024-06-15', status: 'Unpaid' },
+            { id: 1002, title: 'Income Trend', amount: '₹1,25,000', due: '2024-06-15', status: 'Disputed' },
+            { id: 1003, title: 'Income Trend', amount: '₹1,25,000', due: '2024-06-15', status: 'Paid' },
+            { id: 1011, title: 'Income Trend', amount: '₹1,25,000', due: '2024-06-15', status: 'Paid' },
+            { id: 1008, title: 'Income Trend', amount: '₹1,25,000', due: '2024-06-15', status: 'Partially Paid' },
+            { id: 1009, title: 'Income Trend', amount: '₹1,25,000', due: '2024-06-15', status: 'Paid' },
+            { id: 1004, title: 'Income Trend', amount: '₹1,25,000', due: '2024-06-15', status: 'Overdue' },
+            { id: 1006, title: 'Income Trend', amount: '₹1,25,000', due: '2024-06-15', status: 'Awaited' },
+            { id: 1005, title: 'Income Trend', amount: '₹1,25,000', due: '2024-06-15', status: 'Draft' },
+            { id: 1007, title: 'Income Trend', amount: '₹1,25,000', due: '2024-06-15', status: 'Paid' }
+        ];
+
+        // derived stats (simple sample)
+        const totalEarnings = '$1,25,000';
+        const awaited = '$25,000';
+        const overdue = '$25,000';
+
+        /***********************
+         *  RENDER UI (JS)     *
+         ***********************/
+        document.getElementById('totalEarnings').textContent = totalEarnings;
+        document.getElementById('awaited').textContent = awaited;
+        document.getElementById('overdue').textContent = overdue;
+
+        function statusClass(status) {
+            switch ((status || '').toLowerCase()) {
+                case 'paid': return 'pill-paid';
+                case 'overdue': return 'pill-over';
+                case 'partially paid': return 'pill-part';
+                case 'draft': return 'pill-draft';
+                case 'disputed': return 'pill-over';
+                case 'awaited': return 'pill-part';
+                case 'update status': return 'pill-updstatus';
+                default: return 'pill-draft';
+            }
+        }
+
+        // populate concise invoices list (right column)
+
+        // populate full-width invoices below
+        const fullList = document.getElementById('fullList');
+        invoices.forEach(inv => {
+            const div = document.createElement('div');
+            div.className = 'invoice-item';
+            div.style.marginBottom = '10px';
+            div.innerHTML = `
+        <div class="invoice-meta">
+          <div class="invoice-title" >${inv.title}</div>
+          <div class="invoice-sub">${inv.amount}, Due: ${inv.due}</div>
+        </div>
+      <div class="status-container">
+    <span class="status-pill ${statusClass(inv.status)}">${inv.status} ${(inv.status.toLowerCase() === 'update status') ? `<img style="height: 1.2rem;" src = "./down-arrow.png"/>` : ``}</span>
+    ${(inv.status.toLowerCase() === 'overdue' || inv.status.toLowerCase() === 'partially paid') ? `<img src="./bell.png" class="bell-icon" />` :
+                    (inv.status.toLowerCase() === 'draft') ? `<img src="./edit.webp" class="bell-icon" />` : ``}
+  </div>
+      `;
+            fullList.appendChild(div);
+        });
+
+        /***********************
+         *  Graphs
+         ***********************/
+        // Data for different periods
+        const data1Month = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            incomeData: [3500, 4800, 6700, 3200, 5200, 0],
+            momGrowth: [0, 40, 50, -50, 50, -100]
+        };
+
+        const data3Month = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            incomeData: [3500, 4800, 6700, 3200, 5200, 0],
+            momGrowth: [0, 35, 45, -45, 45, -95]
+        };
+
+        let currentPeriod = '1m';
+        let incomeChart;
+
+        function initChart() {
+            const ctx = document.getElementById('incomeChart').getContext('2d');
+            const currentData = currentPeriod === '1m' ? data1Month : data3Month;
+
+            incomeChart = new Chart(ctx, {
+                data: {
+                    labels: currentData.labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Income',
+                            data: currentData.incomeData,
+                            backgroundColor: 'rgba(123,43,212,0.9)',
+                            borderRadius: 7,
+                            barPercentage: 0.8,  // controls the bar width inside category
+                            yAxisID: 'y',
+
+                        },
+                        {
+                            type: 'line',
+                            label: 'MoM Growth',
+                            data: currentData.momGrowth,
+                            borderColor: '#8b2b2b',
+                            backgroundColor: 'rgba(139,43,43,0.06)',
+                            tension: 0.35,
+                            pointRadius: 0,
+                            borderWidth: 3,
+                            fill: false,
+                            yAxisID: 'yPercent'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    stacked: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            position: 'left',
+                            max: 8000,
+                            ticks: {
+                                stepSize: 2000,
+                                callback: function (v) { return '$' + (v / 1000) + 'k'; }
+                            },
+                            grid: { color: 'rgba(0,0,0,0.03)' }
+                        },
+                        yPercent: {
+                            type: 'linear',
+                            position: 'right',
+                            min: -100,
+                            max: 100,
+                            border: {
+                                color: '#8b2b2b',        // line color of the axis
+                                width: 2             // optional, thickness
+                            },
+                            ticks: {
+                                stepSize: 50,
+                                callback: function (v) { return v + '%'; },
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                                tickColor: '#8b2b2b',
+                                color: '#8b2b2b'
+
+                            }
+                        },
+                        x: {
+                            categoryPercentage: 1,
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        // legend: {
+                        //     display: true,
+                        //     labels: {
+                        //         usePointStyle: true,
+                        //         padding: 20
+                        //     }
+                        // },
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true, // enable point in legend
+                                pointStyle: 'circle', // circle marker
+                                color: '#8b2b2b'     // legend text color
+                            }
+                        },
+                        // 
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    if (context.dataset.type === 'bar') {
+                                        return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                                    } else {
+                                        return context.dataset.label + ': ' + context.parsed.y + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function switchPeriod(period) {
+            currentPeriod = period;
+            document.getElementById('btn1m').classList.toggle('active', period === '1m');
+            document.getElementById('btn3m').classList.toggle('active', period === '3m');
+
+            const currentData = period === '1m' ? data1Month : data3Month;
+            incomeChart.data.labels = currentData.labels;
+            incomeChart.data.datasets[0].data = currentData.incomeData;
+            incomeChart.data.datasets[1].data = currentData.momGrowth;
+            incomeChart.update();
+            updateStats(currentData);
+        }
+
+
+
+        window.onload = function () {
+            initChart();
+            updateStats(data1Month);
+        };
+
+        /***********************
+         *  Interactions (small)
+         ***********************/
+        // Period pills interaction (just visual + could re-render chart with different ranges)
+        document.querySelectorAll('.pill').forEach(btn => {
+            btn.addEventListener('click', e => {
+                document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                // Expand: you could re-filter the incomeData and momGrowth arrays here and update the chart
+            });
+        });
+    </script>
+</body>
+
+</html>
