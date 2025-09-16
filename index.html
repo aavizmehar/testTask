@@ -54,8 +54,20 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background-color: rgb(228, 206, 224);
             padding: 1rem;
+            /* background-color: rgb(228, 206, 224); */
+
+        }
+
+        .roundbg {
+            background-color: #fff;
+             
+    border-radius: 56px 56px 0px 0px;
+    padding: 20px;
+        }
+
+        .shortW {
+            background-color: rgb(228, 206, 224);
         }
 
         .left {
@@ -85,9 +97,7 @@
         /* create card */
         .create-card {
             background: var(--Light-Grey, #F2F2F2);
-
             border: 1px solid var(--soft-border);
-            box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -148,11 +158,13 @@
             font-size: 26px;
             margin: 1.5rem 0 0.5rem 0;
             font-weight: 600;
+            font-size: 36px;
         }
 
         .create-card p {
             margin: 0;
-            color: var(--muted)
+            color: var(--muted);
+            font-size: 18px;
         }
 
         /* controls + earnings row */
@@ -426,24 +438,27 @@
 <body>
     <div class="wrap">
         <!-- header -->
-        <header>
-            <div class="left">
-                <div class="title">Dashboard</div>
-            </div>
-            <div class="profile" title="Profile" style="background-image:url('./profile.webp')"></div>
-        </header>
+        <div class="shortW">
+            <header>
+                <div class="left">
+                    <div class="title">Dashboard</div>
+                </div>
+                <div class="profile" title="Profile" style="background-image:url('./profile.webp')"></div>
+            </header>
+            <div class="roundbg"> <!-- create card -->
+                <div class="create-card">
+                    <div class="plus">
+                        <span class="plus-text">+</span>
+                    </div>
+                    <h1>Create New Invoice</h1>
+                    <p>Start by creating and sending new invoice</p>
 
-        <!-- create card -->
-        <div class="create-card">
-            <div class="plus">
-                <span class="plus-text">+</span>
+                </div>
             </div>
-            <h1>Create New Invoice</h1>
-            <p>Start by creating and sending new invoice</p>
-
         </div>
+
         <div style="text-align:center">
-            <h3 style="color:var(--accent);margin:12px;font-weight: 400;">Or upload an existing invoice and set payment
+            <h3 style="font-size:18px;color:var(--accent);margin-bottom:2rem;font-weight: 400;">Or upload an existing invoice and set payment
                 reminder</h3>
         </div>
 
@@ -520,7 +535,7 @@
     </div>
 
     <script>
-        
+
         /***********************
          *  DATA (edit here)   *
          ***********************/
@@ -587,7 +602,7 @@
         </div>
       <div class="status-container">
     <span class="status-pill ${statusClass(inv.status)}">${inv.status} ${(inv.status.toLowerCase() === 'update status') ? `<img style="height: 1.2rem;" src = "./down-arrow.png"/>` : ``}</span>
-    ${(inv.status.toLowerCase() === 'overdue' || inv.status.toLowerCase() === 'partially paid'|| inv.status.toLowerCase() === 'disputed') ? `<img src="./bell.png" class="bell-icon" />` :
+    ${(inv.status.toLowerCase() === 'overdue' || inv.status.toLowerCase() === 'partially paid' || inv.status.toLowerCase() === 'disputed') ? `<img src="./bell.png" class="bell-icon" />` :
                     (inv.status.toLowerCase() === 'draft') ? `<img src="./edit.webp" class="bell-icon" />` : ``}
   </div>
       `;
@@ -598,133 +613,133 @@
          *  Graphs
          ***********************/
         // Data for different periods
-      const data1Month = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    incomeData: [3500, 4800, 6700, 3200, 5200, 7200],
-    momGrowth: [0, 37, 40, -52, 63, 38]
-};
+        const data1Month = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            incomeData: [3500, 4800, 6700, 3200, 5200, 7200],
+            momGrowth: [0, 37, 40, -52, 63, 38]
+        };
 
-const data3Month = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    incomeData: [4200, 5500, 6200, 4800, 6800, 7800],
-    momGrowth: [0, 31, 13, -23, 42, 15]
-};
+        const data3Month = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            incomeData: [4200, 5500, 6200, 4800, 6800, 7800],
+            momGrowth: [0, 31, 13, -23, 42, 15]
+        };
 
         let currentPeriod = '1m';
         let incomeChart;
-function initChart() {
-    const ctx = document.getElementById('incomeChart').getContext('2d');
-    const currentData = currentPeriod === '1m' ? data1Month : data3Month;
+        function initChart() {
+            const ctx = document.getElementById('incomeChart').getContext('2d');
+            const currentData = currentPeriod === '1m' ? data1Month : data3Month;
 
-    incomeChart = new Chart(ctx, {
-        data: {
-            labels: currentData.labels,
-            datasets: [
-                {
-                    type: 'bar',
-                    label: 'income',  // lowercase to match your image
-                    data: currentData.incomeData,
-                    backgroundColor: '#8B5CF6',  // Purple color to match image
-                    borderRadius: 7,
-                    barPercentage: 0.8,
-                    yAxisID: 'y',
-                    order: 2  // Render bars behind line
-                },
-                {
-                    type: 'line',
-                    label: 'momGrowth',  // lowercase to match your image
-                    data: currentData.momGrowth,
-                    borderColor: '#8B2635',  // Dark red/brown to match image
-                    backgroundColor: 'rgba(139,38,53,0.06)',
-                    tension: 0.35,
-                    pointRadius: 0,
-                    borderWidth: 3,
-                    fill: false,
-                    yAxisID: 'yPercent',
-                    order: 1  // Render line on top
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            stacked: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    position: 'left',
-                    max: 8000,
-                    ticks: {
-                        stepSize: 2000,
-                        callback: function (v) { return '$' + (v / 1000) + 'k'; }
-                    },
-                    grid: { color: 'rgba(0,0,0,0.03)' }
-                },
-                yPercent: {
-                    type: 'linear',
-                    position: 'right',
-                    min: -100,
-                    max: 100,
-                    border: {
-                        color: '#8B2635',
-                        width: 2
-                    },
-                    ticks: {
-                        stepSize: 50,
-                        callback: function (v) { return v + '%'; },
-                    },
-                    grid: {
-                        drawOnChartArea: false,
-                        tickColor: '#8B2635',
-                        color: '#8B2635'
-                    }
-                },
-                x: {
-                    categoryPercentage: 1,
-                    grid: {
-                        display: false
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        pointStyle: 'rect',  // Rectangle for bar chart
-                        color: '#666',
-                        padding: 20,
-                        generateLabels: function(chart) {
-                            const datasets = chart.data.datasets;
-                            return datasets.map((dataset, i) => ({
-                                text: dataset.label,
-                                fillStyle: i === 0 ? dataset.backgroundColor : dataset.borderColor,
-                                strokeStyle: i === 0 ? dataset.backgroundColor : dataset.borderColor,
-                                lineWidth: i === 1 ? 3 : 0,
-                                pointStyle: i === 0 ? 'rect' : 'line',
-                                datasetIndex: i
-                            }));
+            incomeChart = new Chart(ctx, {
+                data: {
+                    labels: currentData.labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'income',  // lowercase to match your image
+                            data: currentData.incomeData,
+                            backgroundColor: '#8B5CF6',  // Purple color to match image
+                            borderRadius: 7,
+                            barPercentage: 0.8,
+                            yAxisID: 'y',
+                            order: 2  // Render bars behind line
+                        },
+                        {
+                            type: 'line',
+                            label: 'momGrowth',  // lowercase to match your image
+                            data: currentData.momGrowth,
+                            borderColor: '#8B2635',  // Dark red/brown to match image
+                            backgroundColor: 'rgba(139,38,53,0.06)',
+                            tension: 0.35,
+                            pointRadius: 0,
+                            borderWidth: 3,
+                            fill: false,
+                            yAxisID: 'yPercent',
+                            order: 1  // Render line on top
                         }
-                    }
+                    ]
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            if (context.dataset.type === 'bar') {
-                                return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
-                            } else {
-                                return context.dataset.label + ': ' + context.parsed.y + '%';
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    stacked: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            position: 'left',
+                            max: 8000,
+                            ticks: {
+                                stepSize: 2000,
+                                callback: function (v) { return '$' + (v / 1000) + 'k'; }
+                            },
+                            grid: { color: 'rgba(0,0,0,0.03)' }
+                        },
+                        yPercent: {
+                            type: 'linear',
+                            position: 'right',
+                            min: -100,
+                            max: 100,
+                            border: {
+                                color: '#8B2635',
+                                width: 2
+                            },
+                            ticks: {
+                                stepSize: 50,
+                                callback: function (v) { return v + '%'; },
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                                tickColor: '#8B2635',
+                                color: '#8B2635'
+                            }
+                        },
+                        x: {
+                            categoryPercentage: 1,
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'rect',  // Rectangle for bar chart
+                                color: '#666',
+                                padding: 20,
+                                generateLabels: function (chart) {
+                                    const datasets = chart.data.datasets;
+                                    return datasets.map((dataset, i) => ({
+                                        text: dataset.label,
+                                        fillStyle: i === 0 ? dataset.backgroundColor : dataset.borderColor,
+                                        strokeStyle: i === 0 ? dataset.backgroundColor : dataset.borderColor,
+                                        lineWidth: i === 1 ? 3 : 0,
+                                        pointStyle: i === 0 ? 'rect' : 'line',
+                                        datasetIndex: i
+                                    }));
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    if (context.dataset.type === 'bar') {
+                                        return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                                    } else {
+                                        return context.dataset.label + ': ' + context.parsed.y + '%';
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
+            });
         }
-    });
-}
-function switchPeriod(period) {
+        function switchPeriod(period) {
             currentPeriod = period;
             document.getElementById('btn1m').classList.toggle('active', period === '1m');
             document.getElementById('btn3m').classList.toggle('active', period === '3m');
